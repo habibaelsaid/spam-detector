@@ -32,12 +32,16 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# Load model
 model = pickle.load(open('model.pkl', 'rb'))
 vectorizer = pickle.load(open('vectorizer.pkl', 'rb'))
 stop_words = set(stopwords.words('english'))
 
-spam_words = ['free', 'winner', 'prize', 'offer', 'limited', 'earn', 'cash', 'click', 'buy', 'discount', 'congratulations', 'selected', 'reward', 'bonus', 'guaranteed', 'exclusive']
-phishing_words = ['verify', 'confirm', 'account', 'suspended', 'login', 'password', 'credit', 'update', 'urgent', 'identity', 'secure', 'bank', 'unusual', 'activity', 'credentials', 'immediately', 'restore', 'protect', 'breach']
+spam_words = ['free', 'winner', 'prize', 'offer', 'limited', 'earn', 'cash', 'click', 'buy', 'discount', 
+              'congratulations', 'selected', 'reward', 'bonus', 'guaranteed', 'exclusive']
+phishing_words = ['verify', 'confirm', 'account', 'suspended', 'login', 'password', 'credit', 'update', 
+                  'urgent', 'identity', 'secure', 'bank', 'unusual', 'activity', 'credentials', 
+                  'immediately', 'restore', 'protect', 'breach']
 
 def clean_text(msg):
     msg = msg.lower()
@@ -51,10 +55,9 @@ def highlight_words(text, words_list, is_phishing=False):
     
     color = "#ff4444" if is_phishing else "#ffaa00"   # Red for phishing, Orange for spam
     
-    for word in words_list:
-        replacement = f'<span style="background-color: {color}; color: white; font-weight: bold; padding: 2px 5px; border-radius: 4px;">{word}</span>'
+    for word in sorted(words_list, key=len, reverse=True):
+        replacement = f'<span style="background-color: {color}; color: white; font-weight: bold; padding: 2px 6px; border-radius: 4px;">{word}</span>'
         text = re.sub(re.escape(word), replacement, text, flags=re.IGNORECASE)
-    
     return text
 
 st.markdown("# 🛡️ AI Spam & Phishing Detector")
@@ -73,7 +76,8 @@ if st.button("🔍 Analyze Message"):
         words_in_msg = set(cleaned.split())
         found_phishing = [w for w in phishing_words if w in words_in_msg]
         found_spam = [w for w in spam_words if w in words_in_msg]
-        is_phishing = len(message) > 60 and len(found_phishing) > 0
+        
+        is_phishing = len(found_phishing) > 0
 
         if result == 1 or is_phishing or len(found_spam) > 0:
             if is_phishing:
@@ -83,20 +87,23 @@ if st.button("🔍 Analyze Message"):
                 > Do NOT click any links or provide any credentials.
                 """)
                 if found_phishing:
-                  highlighted = highlight_words(message, found_phishing, is_phishing=True)
-                  st.info(f"🔍 **Phishing words found:**\n\n{highlighted}", unsafe_allow_html=True)
+                    highlighted = highlight_words(message, found_phishing, is_phishing=True)
+                    st.markdown("🔍 **Phishing words found:**", unsafe_allow_html=True)
+                    st.markdown(highlighted, unsafe_allow_html=True)
+                    
             else:
                 st.error("🚨 SPAM DETECTED!")
                 st.markdown("""
-                > ⚠️ **spammers are trying to grab your attention with false promises.**  
+                > ⚠️ **Spammers are trying to grab your attention with false promises.**  
                 > Don't be fooled!
                 """)
                 if found_spam:
-                   highlighted = highlight_words(message, found_spam, is_phishing=False)
-                   st.info(f"🔍 **Spammy words found:**\n\n{highlighted}", unsafe_allow_html=True)
+                    highlighted = highlight_words(message, found_spam, is_phishing=False)
+                    st.markdown("🔍 **Spammy words found:**", unsafe_allow_html=True)
+                    st.markdown(highlighted, unsafe_allow_html=True)
         else:
             st.success("✅ Looks Safe!")
             st.markdown("> No spam or phishing patterns detected.")
 
 st.markdown("---")
-st.markdown("<center><sub>🛡️ Built with Streamlit by Habiba Hossam </sub></center>", unsafe_allow_html=True)
+st.markdown("<center><sub>🛡️ Built with Streamlit by Habiba Hossam</sub></center>", unsafe_allow_html=True)
