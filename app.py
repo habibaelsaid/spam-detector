@@ -45,21 +45,25 @@ def clean_text(msg):
     msg = re.sub(r'\d+', '', msg)
     return " ".join([w for w in msg.split() if w not in stop_words])
 
-# ==================== NEW CONTEXT CHECKER ====================
+# ==================== SUSPICIOUS PHRASES ====================
+def get_suspicious_phrases(text):
+    text_lower = text.lower()
+    suspicious_phrases = [
+        "verify your account", "account suspended", "login to secure", 
+        "secure your account", "update your password", "click here", 
+        "claim your", "you won a free", "free prize", "urgent action", 
+        "immediately", "account has been"
+    ]
+    found_phrases = [phrase for phrase in suspicious_phrases if phrase in text_lower]
+    return found_phrases
+
+# ==================== CONTEXT CHECK FOR SINGLE WORDS ====================
 def is_spammy_context(word, original_text):
     text_lower = original_text.lower()
-    spammy_phrases = {
-        'free': ['win a free', 'free prize', 'get free', 'claim your free', 'free offer', 'free gift'],
-        'update': ['update your account', 'update your password', 'update your information', 'please update'],
-        'click': ['click here', 'click the link', 'click now', 'click below'],
-        'account': ['account suspended', 'your account has been', 'verify your account'],
-        'secure': ['secure your account', 'make your account secure'],
-    }
-    
-    if word in spammy_phrases:
-        for phrase in spammy_phrases[word]:
-            if phrase in text_lower:
-                return True
+    if word == 'free':
+        spammy_free = ['win a free', 'free prize', 'get free', 'claim your free', 
+                      'you won a free', 'free offer', 'free gift']
+        return any(phrase in text_lower for phrase in spammy_free)
     return False
 
 st.markdown("# 🛡️ AI Spam & Phishing Detector")
@@ -79,21 +83,25 @@ if st.button("🔍 Analyze Message"):
         found_phishing = [w for w in phishing_words if w in words_in_msg]
         found_spam = [w for w in spam_words if w in words_in_msg]
 
-        # ==================== IMPROVED LOGIC ====================
-        # Filter spam words using context
+        # Get full suspicious phrases
+        suspicious_expressions = get_suspicious_phrases(message)
+
+        # Filter spam words with context
         strong_spam = [w for w in found_spam if is_spammy_context(w, message)]
-        
-        is_phishing = len(message) > 60 and len(found_phishing) > 0
-        is_spam = len(strong_spam) > 0 or (result == 1 and len(found_spam) > 0)
+
+        is_phishing = len(message) > 60 and (len(found_phishing) > 1 or len(suspicious_expressions) > 0)
+        is_spam = len(strong_spam) > 0 or (result == 1 and len(found_spam) > 1)
 
         if result == 1 or is_phishing or len(found_spam) > 0:
-            if is_phishing:
+            if is_phishing or len(suspicious_expressions) > 0:
                 st.error("🚨 PHISHING DETECTED!")
                 st.markdown("""
                 > ⚠️ **Hackers are trying to steal your personal information.**  
                 > Do NOT click any links or provide any credentials.
                 """)
-                if found_phishing:
+                if suspicious_expressions:
+                    st.info(f"🔍 **Suspicious expressions found:** `{'`, `'.join(suspicious_expressions)}`")
+                elif found_phishing:
                     st.info(f"🔍 **Suspicious words found:** `{'`, `'.join(found_phishing)}`")
             else:
                 st.error("🚨 SPAM DETECTED!")
@@ -101,7 +109,7 @@ if st.button("🔍 Analyze Message"):
                 > ⚠️ **This message is trying to grab your attention with false promises.**  
                 > Don't be fooled!
                 """)
-                if strong_spam:   # Show only strong (context-confirmed) spam words
+                if strong_spam:
                     st.info(f"🔍 **Spammy words found:** `{'`, `'.join(strong_spam)}`")
                 elif found_spam:
                     st.info(f"🔍 **Spammy words found:** `{'`, `'.join(found_spam)}`")
