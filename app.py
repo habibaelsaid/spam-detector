@@ -36,8 +36,8 @@ model = pickle.load(open('model.pkl', 'rb'))
 vectorizer = pickle.load(open('vectorizer.pkl', 'rb'))
 stop_words = set(stopwords.words('english'))
 
-spam_words = ['free', 'winner', 'prize', 'offer', 'limited', 'earn', 'cash', 'click', 'buy', 'discount', 'congratulations', 'selected', 'reward', 'bonus', 'guaranteed', 'risk free', 'act now', 'exclusive']
-phishing_words = ['verify', 'confirm', 'account', 'suspended', 'login', 'password', 'credit', 'update', 'urgent', 'identity', 'secure', 'bank', 'unusual', 'activity', 'credentials', 'unauthorised', 'immediately', 'restore', 'protect', 'breach']
+spam_words = ['free', 'winner', 'prize', 'offer', 'limited', 'earn', 'cash', 'click', 'buy', 'discount', 'congratulations', 'selected', 'reward', 'bonus', 'guaranteed', 'exclusive']
+phishing_words = ['verify', 'confirm', 'account', 'suspended', 'login', 'password', 'credit', 'update', 'urgent', 'identity', 'secure', 'bank', 'unusual', 'activity', 'credentials', 'immediately', 'restore', 'protect', 'breach']
 
 def clean_text(msg):
     msg = msg.lower()
@@ -54,17 +54,16 @@ if st.button("🔍 Analyze Message"):
     if not message.strip():
         st.warning("Please enter a message first!")
     else:
-        with st.spinner("🤖 Scanning message..."):
-            cleaned = clean_text(message)
-            transformed = vectorizer.transform([cleaned])
-            result = model.predict(transformed)[0]
+        cleaned = clean_text(message)
+        transformed = vectorizer.transform([cleaned])
+        result = model.predict(transformed)[0]
 
-        if result == 1:
-            words_in_msg = set(cleaned.split())
-            found_phishing = [w for w in phishing_words if w in words_in_msg]
-            found_spam = [w for w in spam_words if w in words_in_msg]
-            is_phishing = len(message) > 60 and len(found_phishing) > 0
+        words_in_msg = set(cleaned.split())
+        found_phishing = [w for w in phishing_words if w in words_in_msg]
+        found_spam = [w for w in spam_words if w in words_in_msg]
+        is_phishing = len(message) > 60 and len(found_phishing) > 0
 
+        if result == 1 or is_phishing or len(found_spam) > 0:
             if is_phishing:
                 st.error("🚨 PHISHING DETECTED!")
                 st.markdown("""
