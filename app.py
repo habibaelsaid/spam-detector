@@ -10,16 +10,15 @@ st.set_page_config(page_title="AI Spam & Phishing Detector", page_icon="🛡️"
 
 st.markdown("""
 <style>
-    body { background-color: #0d0d0d; }
     .stTextArea textarea {
         background-color: #1a1a2e;
-        color: #00ff99;
-        border: 1px solid #00ff99;
+        color: #7eb8f7;
+        border: 1px solid #7eb8f7;
         font-family: monospace;
         font-size: 14px;
     }
     .stButton>button {
-        background-color: #00ff99;
+        background-color: #7eb8f7;
         color: #0d0d0d;
         font-weight: bold;
         border-radius: 8px;
@@ -28,7 +27,7 @@ st.markdown("""
         padding: 10px;
     }
     .stButton>button:hover {
-        background-color: #00cc77;
+        background-color: #5a9fd4;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -37,8 +36,8 @@ model = pickle.load(open('model.pkl', 'rb'))
 vectorizer = pickle.load(open('vectorizer.pkl', 'rb'))
 stop_words = set(stopwords.words('english'))
 
-spam_words = ['free', 'winner', 'prize', 'offer', 'limited', 'earn', 'cash', 'click', 'buy', 'discount']
-phishing_words = ['verify', 'confirm', 'account', 'suspended', 'login', 'password', 'credit', 'update', 'urgent', 'identity']
+spam_words = ['free', 'winner', 'prize', 'offer', 'limited', 'earn', 'cash', 'click', 'buy', 'discount', 'congratulations', 'selected', 'reward', 'bonus', 'guaranteed', 'risk free', 'act now', 'exclusive']
+phishing_words = ['verify', 'confirm', 'account', 'suspended', 'login', 'password', 'credit', 'update', 'urgent', 'identity', 'secure', 'bank', 'unusual', 'activity', 'credentials', 'unauthorised', 'immediately', 'restore', 'protect', 'breach']
 
 def clean_text(msg):
     msg = msg.lower()
@@ -46,8 +45,7 @@ def clean_text(msg):
     msg = re.sub(r'\d+', '', msg)
     return " ".join([w for w in msg.split() if w not in stop_words])
 
-st.markdown("# 🛡️ Spam & Phishing Detector")
-st.markdown("#### *AI-powered protection against spam and phishing attacks*")
+st.markdown("# 🛡️ AI Spam & Phishing Detector")
 st.markdown("---")
 
 message = st.text_area("📩 Paste your email or message here:", height=200, placeholder="Enter suspicious message...")
@@ -65,7 +63,7 @@ if st.button("🔍 Analyze Message"):
             words_in_msg = set(cleaned.split())
             found_phishing = [w for w in phishing_words if w in words_in_msg]
             found_spam = [w for w in spam_words if w in words_in_msg]
-            is_phishing = len(message) > 100 and len(found_phishing) > 0
+            is_phishing = len(message) > 60 and len(found_phishing) > 0
 
             if is_phishing:
                 st.error("🚨 PHISHING DETECTED!")
