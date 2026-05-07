@@ -50,7 +50,7 @@ spam_df['label']=spam_df['label'].map({'ham':0 , 'spam':1})
 spam_df  
 
 
-# **so basically our spam dataset is too old and it doesn't have nowadays phishing emails, so i added some phishing msgs from another dataset.**
+# **so basically our spam dataset is too old and it doesn't have nowadays phishing emails, so let's add some phishing msgs from another dataset.**
 
 # In[6]:
 
@@ -59,7 +59,7 @@ spam_df
 phishing_df=pd.read_csv("phishing_email.csv" , encoding='latin-1')
 phishing_df=phishing_df.rename(columns={'text_combined':'message'}) # rename to match
 phishing_df.columns = ['message', 'label'] 
-# sample down to only 10k rows
+# sample down to only 10k rows we don't need the whole dataset
 phishing_sample = phishing_df.groupby('label', group_keys=False).apply(lambda x: x.sample(5000, random_state=42)).reset_index(drop=True) 
 
 
@@ -143,7 +143,7 @@ df['clean_msg'] = df['clean_msg'].apply(lambda s: s.translate(str.maketrans('', 
 #importing Regular Expressions to remove numbers 
 import re
 def removeNums(msg):
-    return re.sub(r'\d+', '', msg) #any digit 0-9 one or more
+    return re.sub(r'\d+', '', msg) 
 df['clean_msg'] = df['clean_msg'].apply(removeNums)    
 df.head()
 
@@ -154,7 +154,7 @@ df.head()
 #importing Natural Language Toolkit to remove stopwords
 import nltk
 nltk.download('stopwords')
-from nltk.corpus import stopwords #corpus: a large collection of text
+from nltk.corpus import stopwords
 
 print(stopwords.words('english')[:20])
 
@@ -162,23 +162,16 @@ print(stopwords.words('english')[:20])
 # In[19]:
 
 
-stop_words = set(stopwords.words('english'))  # different name
-
+stop_words = set(stopwords.words('english')) 
 def removeStopwords(msg):
     words = msg.split()
-    return " ".join([w for w in words if w not in stop_words])  # use stop_words
+    return " ".join([w for w in words if w not in stop_words]) 
 
 
 # In[20]:
 
 
 df['clean_msg'] = df['clean_msg'].apply(removeStopwords)
-
-
-# In[21]:
-
-
-combined_df['clean_msg'] = combined_df['message'].apply(removeStopwords)
 
 
 # In[22]:
@@ -427,9 +420,13 @@ plt.show()
 # *re-runing cells from Naive Bayes Model to SMOTE for RandomForestClassifier to check if there's any improvements*
 
 
-# *so after all that cleaning and imbalance handling..STILL GETTING WORSE ACCURACY EVERYTIME HAHAHAHAHAHAHAHAHAHASHASDAWBDAWDBAHSBDAGDHSADHSVDHSAVDASVDVWWGDDBSDSHVHSVDHAVSA*
+# In[1]:
 
-# **Comparing the 4 models to see which one to pick و خلاص**
+
+#so after all that cleaning and imbalance handling..STILL GETTING WORSE ACCURACY EVERY TIME HAHAHAHAHAHAHAHAHAHASHASDAWBDAWDBAHSBDAGDHSADHSVDHSAVDASVDVWWGDDBSDSHVHSVDHAVSA
+
+
+# **Comparing the 4 models to see which one to pick**
 
 # **Naive Bayes:**
 # 

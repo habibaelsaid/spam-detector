@@ -45,6 +45,18 @@ def clean_text(msg):
     msg = re.sub(r'\d+', '', msg)
     return " ".join([w for w in msg.split() if w not in stop_words])
 
+def highlight_words(text, words_list, is_phishing=False):
+    if not words_list:
+        return text
+    
+    color = "#ff4444" if is_phishing else "#ffaa00"   # Red for phishing, Orange for spam
+    
+    for word in words_list:
+        replacement = f'<span style="background-color: {color}; color: white; font-weight: bold; padding: 2px 5px; border-radius: 4px;">{word}</span>'
+        text = re.sub(re.escape(word), replacement, text, flags=re.IGNORECASE)
+    
+    return text
+
 st.markdown("# 🛡️ AI Spam & Phishing Detector")
 st.markdown("---")
 
@@ -71,18 +83,20 @@ if st.button("🔍 Analyze Message"):
                 > Do NOT click any links or provide any credentials.
                 """)
                 if found_phishing:
-                    st.info(f"🔍 **Suspicious words found:** `{'`, `'.join(found_phishing)}`")
+                  highlighted = highlight_words(message, found_phishing, is_phishing=True)
+                  st.info(f"🔍 **Phishing words found:**\n\n{highlighted}", unsafe_allow_html=True)
             else:
                 st.error("🚨 SPAM DETECTED!")
                 st.markdown("""
-                > ⚠️ **This message is trying to grab your attention with false promises.**  
+                > ⚠️ **spammers are trying to grab your attention with false promises.**  
                 > Don't be fooled!
                 """)
                 if found_spam:
-                    st.info(f"🔍 **Spammy words found:** `{'`, `'.join(found_spam)}`")
+                   highlighted = highlight_words(message, found_spam, is_phishing=False)
+                   st.info(f"🔍 **Spammy words found:**\n\n{highlighted}", unsafe_allow_html=True)
         else:
             st.success("✅ Looks Safe!")
             st.markdown("> No spam or phishing patterns detected.")
 
 st.markdown("---")
-st.markdown("<center><sub>🛡️ Built with Streamlit by Habiba</sub></center>", unsafe_allow_html=True)
+st.markdown("<center><sub>🛡️ Built with Streamlit by Habiba Hossam </sub></center>", unsafe_allow_html=True)
