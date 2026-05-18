@@ -48,13 +48,14 @@ st.markdown("""
         box-shadow: 0 4px 20px rgba(126,184,247,0.25);
     }
     .app-title {
-        font-family: 'Pacifico', cursive !important;
-        font-size: 2.2rem;
-        font-weight: 400;
-        color: #7eb8f7;
-        margin-bottom: 4px;
-        letter-spacing: 0.5px;
-    }
+    font-family: 'Rajdhani', sans-serif !important;
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: #7eb8f7;
+    margin-bottom: 4px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
     .app-title .ai-text {
         font-family: 'Rajdhani', sans-serif !important;
         font-weight: 700;
@@ -98,7 +99,6 @@ st.markdown("""
         color: #aaaacc;
         font-size: 12px;
         font-family: 'JetBrains Mono', monospace;
-        text-transform: uppercase;
         letter-spacing: 0.1em;
         margin: 14px 0 6px 0;
     }
@@ -188,7 +188,7 @@ def highlight_text(original_msg, found_phishing, found_spam, found_phrases):
         )
     return highlighted
 
-st.markdown('<div class="app-title">🛡️ <span class="ai-text">AI</span> Spam & Phishing Detector</div>', unsafe_allow_html=True)
+st.markdown('<div class="app-title">🛡️ AI Spam & Phishing Detector</div>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Paste any email or message below 👇 .</p>', unsafe_allow_html=True)
 st.markdown("---")
 
@@ -233,7 +233,7 @@ if st.button("🔍 Analyze Message"):
                 """, unsafe_allow_html=True)
 
             if found_phishing or found_spam or found_phrases:
-                st.markdown('<p class="sus-title">⚡ Sus words found</p>', unsafe_allow_html=True)
+                st.markdown('<p class="sus-title"><em><strong>sus words found 🤨: </strong></em></p>', unsafe_allow_html=True)
                 highlighted = highlight_text(message, found_phishing, found_spam, found_phrases)
                 st.markdown(f'<div class="highlight-box">{highlighted}</div>', unsafe_allow_html=True)
 
