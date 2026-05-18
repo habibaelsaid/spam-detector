@@ -10,7 +10,7 @@ st.set_page_config(page_title="AI Spam & Phishing Detector", page_icon="🛡️"
 
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Pacifico&family=Syne:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Pacifico&family=Rajdhani:wght@500;700&family=Syne:wght@400;700&display=swap');
 
     html, body, [class*="css"] {
         font-family: 'Syne', sans-serif;
@@ -55,6 +55,19 @@ st.markdown("""
         margin-bottom: 4px;
         letter-spacing: 0.5px;
     }
+    .app-title .ai-text {
+        font-family: 'Rajdhani', sans-serif !important;
+        font-weight: 700;
+        font-size: 2.4rem;
+        color: #7eb8f7;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+    .subtitle {
+        color: #666680;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
     .result-box {
         border-radius: 12px;
         padding: 16px 20px;
@@ -81,6 +94,14 @@ st.markdown("""
         margin: 10px 0 4px 0;
         padding: 0;
     }
+    .sus-title {
+        color: #aaaacc;
+        font-size: 12px;
+        font-family: 'JetBrains Mono', monospace;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin: 14px 0 6px 0;
+    }
     .highlight-box {
         background: #111118;
         border: 1px solid #2a2a3d;
@@ -89,38 +110,23 @@ st.markdown("""
         font-family: 'JetBrains Mono', monospace;
         font-size: 13px;
         line-height: 1.8;
-        margin-top: 12px;
+        margin-top: 4px;
         white-space: pre-wrap;
         word-wrap: break-word;
     }
     .hl-phishing {
-        background: rgba(248, 81, 73, 0.3);
-        color: #ff9999;
+        background: rgba(255, 140, 0, 0.3);
+        color: #ffaa44;
         border-radius: 3px;
         padding: 1px 4px;
         font-weight: 700;
     }
     .hl-spam {
-        background: rgba(210, 153, 34, 0.3);
-        color: #ffd700;
+        background: rgba(255, 140, 0, 0.3);
+        color: #ffaa44;
         border-radius: 3px;
         padding: 1px 4px;
         font-weight: 700;
-    }
-    .stat-row {
-        display: flex;
-        gap: 12px;
-        margin-top: 12px;
-        flex-wrap: wrap;
-    }
-    .stat-chip {
-        background: #1a1a2e;
-        border: 1px solid #2a2a3d;
-        border-radius: 20px;
-        padding: 4px 14px;
-        font-size: 12px;
-        font-family: 'JetBrains Mono', monospace;
-        color: #7eb8f7;
     }
     .footer { text-align: center; color: #444; font-size: 12px; margin-top: 40px; }
 </style>
@@ -182,9 +188,8 @@ def highlight_text(original_msg, found_phishing, found_spam, found_phrases):
         )
     return highlighted
 
-# --- UI ---
-st.markdown('<div class="app-title">🛡️ AI Spam & Phishing Detector</div>', unsafe_allow_html=True)
-st.markdown("Paste any email or message below — the AI will analyze and highlight suspicious content.")
+st.markdown('<div class="app-title">🛡️ <span class="ai-text">AI</span> Spam & Phishing Detector</div>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Paste any email or message below 👇 .</p>', unsafe_allow_html=True)
 st.markdown("---")
 
 message = st.text_area("📩 Message:", height=200, placeholder="Paste your email or message here...")
@@ -227,17 +232,8 @@ if st.button("🔍 Analyze Message"):
                 Don't be fooled!</p>
                 """, unsafe_allow_html=True)
 
-            chips = ""
-            if found_phrases:
-                chips += f'<span class="stat-chip">🔴 {len(found_phrases)} suspicious phrase(s)</span>'
-            if found_phishing:
-                chips += f'<span class="stat-chip">🔴 {len(found_phishing)} phishing word(s)</span>'
-            if found_spam:
-                chips += f'<span class="stat-chip">🟡 {len(found_spam)} spam word(s)</span>'
-            if chips:
-                st.markdown(f'<div class="stat-row">{chips}</div>', unsafe_allow_html=True)
-
             if found_phishing or found_spam or found_phrases:
+                st.markdown('<p class="sus-title">⚡ Sus words found</p>', unsafe_allow_html=True)
                 highlighted = highlight_text(message, found_phishing, found_spam, found_phrases)
                 st.markdown(f'<div class="highlight-box">{highlighted}</div>', unsafe_allow_html=True)
 
@@ -252,4 +248,4 @@ if st.button("🔍 Analyze Message"):
             """, unsafe_allow_html=True)
 
 st.markdown("---")
-st.markdown('<div class="footer">🛡️ Built with Streamlit | By Habiba Hossam </div>', unsafe_allow_html=True)
+st.markdown('<div class="footer">🛡️ Built with Streamlit | By Habiba Hossam</div>', unsafe_allow_html=True)
