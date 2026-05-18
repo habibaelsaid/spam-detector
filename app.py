@@ -198,6 +198,7 @@ if st.button("🔍 Analyze Message"):
         found_phrases = [p for p in suspicious_phrases if p in message.lower()]
         has_dangerous_context = len(found_phrases) > 0 or len(found_phishing) >= 2
         is_spam_keyword = len(found_spam) >= 3
+        is_phishing = False
 
         if result == 1:
             is_phishing = has_dangerous_context
