@@ -96,10 +96,8 @@ st.markdown("""
         padding: 0;
     }
    .sus-title {
-    color: #aaaacc;
-    font-size: 13px;
-    font-family: 'Syne', sans-serif;
-    letter-spacing: 0;
+    color: #666680;
+    font-size: 14px;
     margin: 14px 0 6px 0;
 }
     .highlight-box {
@@ -189,7 +187,7 @@ def highlight_text(original_msg, found_phishing, found_spam, found_phrases):
     return highlighted
 
 st.markdown('<div class="app-title">🛡️ AI Spam & Phishing Detector</div>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Paste any email or message below 👇 .</p>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Paste any email or message below 👇 </p>', unsafe_allow_html=True)
 st.markdown("---")
 
 message = st.text_area("📩 Message:", height=200, placeholder="Paste your email or message here...")
