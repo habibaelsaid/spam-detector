@@ -95,13 +95,13 @@ st.markdown("""
         margin: 10px 0 4px 0;
         padding: 0;
     }
-    .sus-title {
-        color: #aaaacc;
-        font-size: 12px;
-        font-family: 'JetBrains Mono', monospace;
-        letter-spacing: 0.1em;
-        margin: 14px 0 6px 0;
-    }
+   .sus-title {
+    color: #aaaacc;
+    font-size: 13px;
+    font-family: 'Syne', sans-serif;
+    letter-spacing: 0;
+    margin: 14px 0 6px 0;
+}
     .highlight-box {
         background: #111118;
         border: 1px solid #2a2a3d;
@@ -233,7 +233,7 @@ if st.button("🔍 Analyze Message"):
                 """, unsafe_allow_html=True)
 
             if found_phishing or found_spam or found_phrases:
-                st.markdown('<p class="sus-title"><em><strong>sus words found 🤨: </strong></em></p>', unsafe_allow_html=True)
+                st.markdown('<p class="sus-title"><em><strong>sus words found: </strong></em></p>', unsafe_allow_html=True)
                 highlighted = highlight_text(message, found_phishing, found_spam, found_phrases)
                 st.markdown(f'<div class="highlight-box">{highlighted}</div>', unsafe_allow_html=True)
 
