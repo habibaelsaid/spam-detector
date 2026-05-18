@@ -48,19 +48,11 @@ st.markdown("""
         box-shadow: 0 4px 20px rgba(126,184,247,0.25);
     }
     .app-title {
-    font-family: 'Rajdhani', sans-serif !important;
-    font-size: 2.6rem;
-    font-weight: 700;
-    color: #7eb8f7;
-    margin-bottom: 4px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-}
-    .app-title .ai-text {
         font-family: 'Rajdhani', sans-serif !important;
+        font-size: 2.6rem;
         font-weight: 700;
-        font-size: 2.4rem;
         color: #7eb8f7;
+        margin-bottom: 4px;
         letter-spacing: 2px;
         text-transform: uppercase;
     }
@@ -95,11 +87,11 @@ st.markdown("""
         margin: 10px 0 4px 0;
         padding: 0;
     }
-   .sus-title {
-    color: #666680;
-    font-size: 14px;
-    margin: 14px 0 6px 0;
-}
+    .sus-title {
+        color: #666680;
+        font-size: 14px;
+        margin: 14px 0 6px 0;
+    }
     .highlight-box {
         background: #111118;
         border: 1px solid #2a2a3d;
@@ -187,7 +179,7 @@ def highlight_text(original_msg, found_phishing, found_spam, found_phrases):
     return highlighted
 
 st.markdown('<div class="app-title">🛡️ AI Spam & Phishing Detector</div>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Paste any email or message below 👇 </p>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Paste any email or message below 👇</p>', unsafe_allow_html=True)
 st.markdown("---")
 
 message = st.text_area("📩 Message:", height=200, placeholder="Paste your email or message here...")
@@ -205,10 +197,14 @@ if st.button("🔍 Analyze Message"):
         found_spam = [w for w in spam_words if w in words_in_msg]
         found_phrases = [p for p in suspicious_phrases if p in message.lower()]
         has_dangerous_context = len(found_phrases) > 0 or len(found_phishing) >= 2
+        is_spam_keyword = len(found_spam) >= 3
 
         if result == 1:
             is_phishing = has_dangerous_context
+            if not is_phishing and not is_spam_keyword:
+                result = 0
 
+        if result == 1:
             if is_phishing:
                 st.markdown("""
                 <div class="result-box result-phishing">
@@ -231,7 +227,7 @@ if st.button("🔍 Analyze Message"):
                 """, unsafe_allow_html=True)
 
             if found_phishing or found_spam or found_phrases:
-                st.markdown('<p class="sus-title"><em><strong>sus words found: </strong></em></p>', unsafe_allow_html=True)
+                st.markdown('<p class="sus-title"><em><strong>sus words found:</strong></em></p>', unsafe_allow_html=True)
                 highlighted = highlight_text(message, found_phishing, found_spam, found_phrases)
                 st.markdown(f'<div class="highlight-box">{highlighted}</div>', unsafe_allow_html=True)
 
