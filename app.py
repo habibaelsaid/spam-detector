@@ -10,7 +10,7 @@ st.set_page_config(page_title="AI Spam & Phishing Detector", page_icon="🛡️"
 
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Pacifico&family=Syne:wght@400;700&display=swap');
 
     html, body, [class*="css"] {
         font-family: 'Syne', sans-serif;
@@ -47,11 +47,21 @@ st.markdown("""
         transform: translateY(-1px);
         box-shadow: 0 4px 20px rgba(126,184,247,0.25);
     }
+    .app-title {
+        font-family: 'Pacifico', cursive !important;
+        font-size: 2.2rem;
+        font-weight: 400;
+        color: #7eb8f7;
+        margin-bottom: 4px;
+        letter-spacing: 0.5px;
+    }
     .result-box {
         border-radius: 12px;
-        padding: 20px 24px;
-        margin: 16px 0;
+        padding: 16px 20px;
+        margin: 12px 0 4px 0;
         font-family: 'Syne', sans-serif;
+        width: 100%;
+        box-sizing: border-box;
     }
     .result-safe {
         background: rgba(46, 160, 67, 0.12);
@@ -64,6 +74,12 @@ st.markdown("""
     .result-spam {
         background: rgba(210, 153, 34, 0.12);
         border: 1px solid rgba(210, 153, 34, 0.4);
+    }
+    .warning-msg {
+        color: #ffd700;
+        font-size: 14px;
+        margin: 10px 0 4px 0;
+        padding: 0;
     }
     .highlight-box {
         background: #111118;
@@ -91,30 +107,6 @@ st.markdown("""
         padding: 1px 4px;
         font-weight: 700;
     }
-    .legend {
-        display: flex;
-        gap: 16px;
-        margin-top: 10px;
-        font-size: 12px;
-        font-family: 'JetBrains Mono', monospace;
-    }
-    .legend-item {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-    .dot-phishing {
-        width: 10px; height: 10px;
-        background: rgba(248, 81, 73, 0.7);
-        border-radius: 2px;
-        display: inline-block;
-    }
-    .dot-spam {
-        width: 10px; height: 10px;
-        background: rgba(210, 153, 34, 0.7);
-        border-radius: 2px;
-        display: inline-block;
-    }
     .stat-row {
         display: flex;
         gap: 12px;
@@ -130,11 +122,9 @@ st.markdown("""
         font-family: 'JetBrains Mono', monospace;
         color: #7eb8f7;
     }
-    h1 { font-family: 'Syne', sans-serif !important; font-weight: 800 !important; }
     .footer { text-align: center; color: #444; font-size: 12px; margin-top: 40px; }
 </style>
 """, unsafe_allow_html=True)
-
 
 @st.cache_resource
 def load_model():
@@ -164,7 +154,6 @@ suspicious_phrases = [
     "your password has", "your account will"
 ]
 
-
 def clean_text(msg):
     msg = msg.lower()
     msg = msg.translate(str.maketrans(string.punctuation, ' ' * len(string.punctuation)))
@@ -176,32 +165,26 @@ def clean_text(msg):
 
 def highlight_text(original_msg, found_phishing, found_spam, found_phrases):
     highlighted = original_msg
-
     for phrase in sorted(found_phrases, key=len, reverse=True):
         pattern = re.compile(re.escape(phrase), re.IGNORECASE)
         highlighted = pattern.sub(
             lambda m: f'<span class="hl-phishing">{m.group()}</span>', highlighted
         )
-
-    
     for word in found_phishing:
         pattern = re.compile(r'\b' + re.escape(word) + r'\b', re.IGNORECASE)
         highlighted = pattern.sub(
             lambda m: f'<span class="hl-phishing">{m.group()}</span>', highlighted
         )
-
-    
     for word in found_spam:
         pattern = re.compile(r'\b' + re.escape(word) + r'\b', re.IGNORECASE)
         highlighted = pattern.sub(
             lambda m: f'<span class="hl-spam">{m.group()}</span>', highlighted
         )
-
     return highlighted
 
-
-st.markdown("# 🛡️ AI Spam & Phishing Detector")
-st.markdown("Paste any email or message below.")
+# --- UI ---
+st.markdown('<div class="app-title">🛡️ AI Spam & Phishing Detector</div>', unsafe_allow_html=True)
+st.markdown("Paste any email or message below — the AI will analyze and highlight suspicious content.")
 st.markdown("---")
 
 message = st.text_area("📩 Message:", height=200, placeholder="Paste your email or message here...")
@@ -210,20 +193,16 @@ if st.button("🔍 Analyze Message"):
     if not message.strip():
         st.warning("Please enter a message first!")
     else:
-        
         cleaned = clean_text(message)
         transformed = vectorizer.transform([cleaned])
         result = model.predict(transformed)[0]
 
-        
         words_in_msg = set(cleaned.split())
         found_phishing = [w for w in phishing_words if w in words_in_msg]
         found_spam = [w for w in spam_words if w in words_in_msg]
         found_phrases = [p for p in suspicious_phrases if p in message.lower()]
-
         has_dangerous_context = len(found_phrases) > 0 or len(found_phishing) >= 2
 
-        
         if result == 1:
             is_phishing = has_dangerous_context
 
@@ -231,20 +210,23 @@ if st.button("🔍 Analyze Message"):
                 st.markdown("""
                 <div class="result-box result-phishing">
                     <h3 style="color:#ff6b6b; margin:0">🚨 PHISHING DETECTED</h3>
-                    <p style="margin:8px 0 0; color:#ffaaaa">Hackers are trying to steal your personal information.<br>
-                    Do <strong>NOT</strong> click any links or provide any credentials.</p>
                 </div>
+                """, unsafe_allow_html=True)
+                st.markdown("""
+                <p class="warning-msg">⚠️ Hackers are trying to steal your personal information.
+                Do <strong>NOT</strong> click any links or provide any credentials.</p>
                 """, unsafe_allow_html=True)
             else:
                 st.markdown("""
                 <div class="result-box result-spam">
                     <h3 style="color:#ffd700; margin:0">⚠️ SPAM DETECTED</h3>
-                    <p style="margin:8px 0 0; color:#ffe680">This message is trying to grab your attention with false promises.<br>
-                    Don't be fooled!</p>
                 </div>
                 """, unsafe_allow_html=True)
+                st.markdown("""
+                <p class="warning-msg">⚠️ This message is trying to grab your attention with false promises.
+                Don't be fooled!</p>
+                """, unsafe_allow_html=True)
 
-            
             chips = ""
             if found_phrases:
                 chips += f'<span class="stat-chip">🔴 {len(found_phrases)} suspicious phrase(s)</span>'
@@ -255,27 +237,19 @@ if st.button("🔍 Analyze Message"):
             if chips:
                 st.markdown(f'<div class="stat-row">{chips}</div>', unsafe_allow_html=True)
 
-            
-            all_phishing = found_phishing
-            all_spam = found_spam
-            if all_phishing or all_spam or found_phrases:
-                st.markdown("#### 🔍 Highlighted Message")
-                highlighted = highlight_text(message, all_phishing, all_spam, found_phrases)
+            if found_phishing or found_spam or found_phrases:
+                highlighted = highlight_text(message, found_phishing, found_spam, found_phrases)
                 st.markdown(f'<div class="highlight-box">{highlighted}</div>', unsafe_allow_html=True)
-                st.markdown("""
-                <div class="legend">
-                    <div class="legend-item"><span class="dot-phishing"></span> Phishing indicator</div>
-                    <div class="legend-item"><span class="dot-spam"></span> Spam indicator</div>
-                </div>
-                """, unsafe_allow_html=True)
 
         else:
             st.markdown("""
             <div class="result-box result-safe">
                 <h3 style="color:#56d364; margin:0">✅ Looks Safe</h3>
-                <p style="margin:8px 0 0; color:#aaffaa">No spam or phishing patterns detected in this message.</p>
             </div>
+            """, unsafe_allow_html=True)
+            st.markdown("""
+            <p class="warning-msg" style="color:#aaffaa;">No spam or phishing patterns detected in this message.</p>
             """, unsafe_allow_html=True)
 
 st.markdown("---")
-st.markdown('<div class="footer">🛡️ Built with Streamlit | By Habiba Hossam· </div>', unsafe_allow_html=True)
+st.markdown('<div class="footer">🛡️ Built with Streamlit | By Habiba Hossam </div>', unsafe_allow_html=True)
